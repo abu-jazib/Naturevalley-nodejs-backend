@@ -17,33 +17,6 @@ const validateBlog = [
 
 
 // Create a new blog post
-router.post('/', validateBlog, async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
-    const { title, content, imageUrl, author, authorImage, authorDescription, tags } = req.body;
-    const blogRef = db.collection('blogs').doc();
-    const newBlog = {
-      title,
-      content,
-      imageUrl: imageUrl || null,
-      author,
-      authorImageUrl: authorImage || null,
-      authorDescription: authorDescription || '',
-      tags: tags || [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    await blogRef.set(newBlog);
-    res.status(201).json({ id: blogRef.id, message: 'Blog post created successfully', blog: newBlog });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create blog post', details: error.message });
-  }
-});
 
 // Get all blog posts
 router.get('/', async (req, res) => {
@@ -69,57 +42,6 @@ router.get('/:id', async (req, res) => {
     res.json({ id: blogDoc.id, ...blogDoc.data() });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch blog post', details: error.message });
-  }
-});
-
-// Update blog post
-router.put('/:id', validateBlog, async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
-    const { id } = req.params;
-    const { title, content, imageUrl, author, authorImage, authorDescription, tags } = req.body;
-    const blogDoc = await db.collection('blogs').doc(id).get();
-
-    if (!blogDoc.exists) {
-      return res.status(404).json({ error: 'Blog post not found' });
-    }
-
-    const updatedData = {
-      title,
-      content,
-      imageUrl: imageUrl || null,
-      author,
-      authorImageUrl: authorImage || null,
-      authorDescription: authorDescription || '',
-      tags: tags || [],
-      updatedAt: new Date()
-    };
-    
-    await db.collection('blogs').doc(id).update(updatedData);
-    res.json({ message: 'Blog post updated successfully', blog: updatedData });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update blog post', details: error.message });
-  }
-});
-
-// Delete blog post
-router.delete('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const blogDoc = await db.collection('blogs').doc(id).get();
-
-    if (!blogDoc.exists) {
-      return res.status(404).json({ error: 'Blog post not found' });
-    }
-
-    await db.collection('blogs').doc(id).delete();
-    res.json({ message: 'Blog post deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete blog post', details: error.message });
   }
 });
 

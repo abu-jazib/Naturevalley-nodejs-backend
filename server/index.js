@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import blogRoutes from './routes/blog.js';
 import productRoutes from './routes/products.js';
 import formRoutes from './routes/forms.js';
+import subscribeRoutes from "./routes/subscribe.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.get('/api', (req, res) => {
 app.use('/api/blogs', blogRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/forms', formRoutes);
+app.use("/api/subscribe", subscribeRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -12,7 +12,6 @@ const validateForm = [
   body('message').notEmpty().trim(),  
   body('subject').notEmpty().trim()  
 ];  
-  
 // Submit form (public)  
 router.post('/', validateForm, async (req, res) => {  
   const errors = validationResult(req);  
