@@ -7,11 +7,14 @@ import blogRoutes from './routes/blog.js';
 import productRoutes from './routes/products.js';
 import formRoutes from './routes/forms.js';
 import subscribeRoutes from "./routes/subscribe.js";
+import assetsUploadRoutes from './routes/assetsUpload.js';
+import checkVisitorsRoutes from './routes/checkVisitors.js';
+
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 4000;
 
 // Middleware
 app.use(helmet());
@@ -24,10 +27,13 @@ app.get('/api', (req, res) => {
 });
 
 // Routes
+app.use('/api/checkVisitors', checkVisitorsRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/forms', formRoutes);
 app.use("/api/subscribe", subscribeRoutes);
+app.use('/api/assets-upload', assetsUploadRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -35,7 +41,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// Start server
+// Ensure server runs only on PORT 4000
 app.listen(PORT, () => {
+  if (process.env.PORT && process.env.PORT !== '4000') {
+    console.warn(`Warning: Server is forced to run on port ${PORT}, ignoring process.env.PORT (${process.env.PORT}).`);
+  }
   console.log(`Server is running on port ${PORT}`);
+}).on('error', (err) => {
+  console.error(`Failed to start server on port ${PORT}:`, err.message);
+  process.exit(1);
 });

@@ -1,6 +1,8 @@
 import express from "express";
 import { body, validationResult } from "express-validator";
 import { db } from "../config/firebase.js";
+import { sendWelcomeEmail } from "../utils/mail.js";
+import axios from "axios";
 
 const router = express.Router();
 
@@ -29,6 +31,8 @@ router.post("/", validateSubscription, async (req, res) => {
       email,
       subscribedAt: new Date(),
     });
+    await sendWelcomeEmail(email);
+
 
     res.status(201).json({ message: "Thank you for subscribing" });
   } catch (error) {
