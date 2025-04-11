@@ -1,6 +1,7 @@
 import express from 'express';  
 import { body, validationResult } from 'express-validator';  
-import { db } from '../config/firebase.js';  
+import { db } from '../config/firebase.js'; 
+import { sendSupportEmail } from "../utils/mail.js"; 
   
 const router = express.Router();  
   
@@ -22,9 +23,6 @@ router.post('/', validateForm, async (req, res) => {
   try {  
     const { name, email, number, message, subject } = req.body;  
   
-    // Debugging log to check the received phone number  
-    console.log('Received data:', { name, email, number, message, subject });  
-  
     const formRef = db.collection('forms').doc();  
     await formRef.set({  
       name,  
@@ -35,6 +33,8 @@ router.post('/', validateForm, async (req, res) => {
       status: 'pending',  
       createdAt: new Date()  
     });  
+
+    await sendSupportEmail(email,name);
   
     res.status(201).json({ message: 'Form submitted successfully' });  
   } catch (error) {  
