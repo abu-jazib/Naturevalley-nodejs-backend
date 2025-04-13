@@ -1,6 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { db } from '../config/firebase.js';
+import admin from 'firebase-admin';
 
 const router = express.Router();
 
@@ -33,11 +34,17 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const blogDoc = await db.collection('blogs').doc(id).get();
+    const blogRef = db.collection('blogs').doc(id);
+    const blogDoc = await blogRef.get();
 
     if (!blogDoc.exists) {
       return res.status(404).json({ error: 'Blog post not found' });
     }
+
+    // Increment the views count atomically
+    await blogRef.update({
+      views: admin.firestore.FieldValue.increment(1),
+    });
 
     res.json({ id: blogDoc.id, ...blogDoc.data() });
   } catch (error) {
